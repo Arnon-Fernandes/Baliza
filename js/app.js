@@ -4,21 +4,49 @@ let consultorId = null, consultorNome = ''
 let licencas = [], condicionantes = []
 let licencaSelecionada = null
 let telaAtual = 'dashboard'
+let _iniciado = false  // guard: impede init() rodar mais de uma vez
 
 // ─── Wizard state ─────────────────────────────────────────────────────────
 let wiz = { step: 1, clienteNome: '', clienteCnpj: '', tipo: '', numero: '', orgao: '', empreendimento: '', dataEmissao: '', dataValidade: '', nConds: 0, conds: [] }
 
 // ─── Init ─────────────────────────────────────────────────────────────────
 async function init() {
+  if (_iniciado) return   // evita chamadas duplas
+  _iniciado = true
+
   const { data: { session } } = await db.auth.getSession()
   if (!session) { window.location.href = 'login.html'; return }
-  const { data: c } = await db.from('consultores').select('*').eq('user_id', session.user.id).single()
-  if (!c) { window.location.href = 'login.html'; return }
+
+  let { data: c } = await db.from('consultores').select('*').eq('user_id', session.user.id).single()
+
+  // Se não existe registro do consultor, tenta criar automaticamente
+  if (!c) {
+    const { data: novo } = await db.from('consultores').insert({
+      user_id: session.user.id,
+      nome: session.user.email?.split('@')[0] ?? 'Consultor',
+      plano: 'free'
+    }).select().single()
+    c = novo
+  }
+
+  // Se ainda não tem registro, desloga e volta ao login
+  if (!c) {
+    await db.auth.signOut()
+    window.location.href = 'login.html'
+    return
+  }
+
   consultorId = c.id
   consultorNome = c.nome
   document.getElementById('sidebar-nome').textContent = c.nome
   document.getElementById('sidebar-empresa').textContent = c.empresa || 'Consultor Ambiental'
   document.getElementById('header-date').textContent = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+
+  // Escuta mudanças de auth — só desloga se sessão encerrar
+  db.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_OUT') window.location.href = 'login.html'
+  })
+
   await carregar()
   mostrarTela('dashboard')
 }
