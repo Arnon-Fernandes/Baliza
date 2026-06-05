@@ -42,11 +42,6 @@ async function init() {
   document.getElementById('sidebar-empresa').textContent = c.empresa || 'Consultor Ambiental'
   document.getElementById('header-date').textContent = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
 
-  // Escuta mudanças de auth — só desloga se sessão encerrar
-  db.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_OUT') window.location.href = 'login.html'
-  })
-
   await carregar()
   mostrarTela('dashboard')
 }
