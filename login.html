@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baliza — Entrar</title>
+  <link rel="stylesheet" href="css/baliza.css">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">
+        <span class="lb">B</span><span class="dot"></span>
+      </div>
+      <h1>Baliza</h1>
+    </div>
+
+    <div class="login-box">
+      <div id="msg" style="margin-bottom:0"></div>
+
+      <div id="campo-nome" class="field" style="display:none">
+        <label class="label">Nome completo</label>
+        <input class="input" id="nome" type="text" placeholder="Seu nome">
+      </div>
+      <div id="campo-empresa" class="field" style="display:none">
+        <label class="label">Empresa / consultoria</label>
+        <input class="input" id="empresa" type="text" placeholder="opcional">
+      </div>
+      <div class="field">
+        <label class="label">E-mail</label>
+        <input class="input" id="email" type="email" placeholder="seu@email.com">
+      </div>
+      <div class="field" style="margin-bottom:20px">
+        <label class="label">Senha</label>
+        <input class="input" id="senha" type="password" placeholder="••••••••">
+      </div>
+
+      <button class="btn btn-cyan" id="btn" style="width:100%;height:44px" onclick="acaoAuth()">Entrar</button>
+    </div>
+
+    <div class="login-toggle" id="toggle">
+      Não tem conta? <a onclick="alternar()">Cadastre-se grátis</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script>
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+  let modo = 'login'
+
+  db.auth.getSession().then(({ data: { session } }) => { if (session) location.href = 'app.html' })
+
+  function alternar() {
+    modo = modo === 'login' ? 'cadastro' : 'login'
+    document.getElementById('campo-nome').style.display = modo === 'cadastro' ? 'block' : 'none'
+    document.getElementById('campo-empresa').style.display = modo === 'cadastro' ? 'block' : 'none'
+    document.getElementById('btn').textContent = modo === 'login' ? 'Entrar' : 'Criar conta'
+    document.getElementById('toggle').innerHTML = modo === 'login'
+      ? 'Não tem conta? <a onclick="alternar()">Cadastre-se grátis</a>'
+      : 'Já tem conta? <a onclick="alternar()">Entrar</a>'
+    document.getElementById('msg').innerHTML = ''
+  }
+
+  async function acaoAuth() {
+    const email = document.getElementById('email').value.trim()
+    const senha = document.getElementById('senha').value
+    const btn = document.getElementById('btn'), msg = document.getElementById('msg')
+    if (!email || !senha) { msg.innerHTML = '<div class="msg-err" style="margin-bottom:12px">Preencha e-mail e senha</div>'; return }
+    btn.disabled = true; btn.textContent = 'Aguarde…'; msg.innerHTML = ''
+
+    if (modo === 'login') {
+      const { error } = await db.auth.signInWithPassword({ email, password: senha })
+      if (error) { msg.innerHTML = '<div class="msg-err" style="margin-bottom:12px">E-mail ou senha incorretos</div>' }
+      else location.href = 'app.html'
+    } else {
+      const nome = document.getElementById('nome').value.trim()
+      const empresa = document.getElementById('empresa').value.trim()
+      if (!nome) { msg.innerHTML = '<div class="msg-err" style="margin-bottom:12px">Informe seu nome</div>'; btn.disabled = false; btn.textContent = 'Criar conta'; return }
+      const { data, error } = await db.auth.signUp({ email, password: senha })
+      if (error) { msg.innerHTML = `<div class="msg-err" style="margin-bottom:12px">${error.message}</div>` }
+      else {
+        if (data.user) await db.from('consultores').insert({ user_id: data.user.id, nome, empresa: empresa || null })
+        msg.innerHTML = '<div class="msg-ok" style="margin-bottom:12px">✓ Conta criada! Verifique seu e-mail.</div>'
+      }
+    }
+    btn.disabled = false
+    btn.textContent = modo === 'login' ? 'Entrar' : 'Criar conta'
+  }
+
+  document.getElementById('senha').addEventListener('keydown', e => { if (e.key === 'Enter') acaoAuth() })
+</script>
+</body>
+</html>

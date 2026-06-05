@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Baliza</title>
+  <link rel="stylesheet" href="css/baliza.css">
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><span class="lb">B</span><span class="dot"></span></div>
+      <div class="logo-text"><h1>Baliza</h1><p>Licenciamento Ambiental</p></div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" data-tela="dashboard" onclick="mostrarTela('dashboard')">
+        <span class="nav-icon">◎</span> Painel
+      </div>
+      <div class="nav-item" data-tela="licencas" onclick="mostrarTela('licencas')">
+        <span class="nav-icon">≡</span> Licenças
+        <span class="nav-badge" id="badge-nav" style="display:none">0</span>
+      </div>
+      <div class="nav-item" data-tela="perfil" onclick="mostrarTela('perfil')">
+        <span class="nav-icon">○</span> Perfil
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <strong id="sidebar-nome">—</strong>
+      <span id="sidebar-empresa">—</span>
+      <div style="margin-top:10px">
+        <button class="btn btn-outline btn-sair" onclick="sair()">Sair</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="header">
+      <span class="header-title" id="header-title">Painel</span>
+      <span class="header-date" id="header-date">—</span>
+    </header>
+    <main class="content">
+
+      <!-- ═══ DASHBOARD ═══ -->
+      <div class="screen active" id="tela-dashboard">
+        <div class="ph">
+          <h2>Painel</h2>
+          <p>Visão geral de prazos e condicionantes</p>
+        </div>
+
+        <div class="g3" style="margin-bottom:16px">
+          <div class="kpi" style="background:#FDDEDE">
+            <div class="kpi-n" style="color:var(--red)" id="kpi-a">—</div>
+            <div class="kpi-l" style="color:var(--red)">Atrasadas</div>
+          </div>
+          <div class="kpi" style="background:#FFF0D0">
+            <div class="kpi-n" style="color:#9A6A00" id="kpi-al">—</div>
+            <div class="kpi-l" style="color:#9A6A00">Atenção 30d</div>
+          </div>
+          <div class="kpi" style="background:#D6F5EF">
+            <div class="kpi-n" style="color:#007A65" id="kpi-ok">—</div>
+            <div class="kpi-l" style="color:#007A65">Em dia</div>
+          </div>
+        </div>
+
+        <div class="g2" style="margin-bottom:20px">
+          <div class="card" style="padding:14px 18px">
+            <div style="font-size:24px;font-weight:300;font-family:'DM Mono',monospace" id="kpi-lic">—</div>
+            <div style="font-size:11px;color:var(--ink2);margin-top:3px">Licenças</div>
+          </div>
+          <div class="card" style="padding:14px 18px">
+            <div style="font-size:24px;font-weight:300;font-family:'DM Mono',monospace" id="kpi-co">—</div>
+            <div style="font-size:11px;color:var(--ink2);margin-top:3px">Condicionantes</div>
+          </div>
+        </div>
+
+        <div style="font-size:11px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Precisam de ação</div>
+        <div id="dash-urgentes">Carregando…</div>
+      </div>
+
+      <!-- ═══ LICENÇAS ═══ -->
+      <div class="screen" id="tela-licencas">
+        <div class="ph row-b">
+          <div><h2>Licenças</h2><p id="subtitulo-licencas">—</p></div>
+          <button class="btn btn-cyan" onclick="abrirWizard()">+ Nova licença</button>
+        </div>
+        <div id="lista-licencas">Carregando…</div>
+      </div>
+
+      <!-- ═══ PERFIL ═══ -->
+      <div class="screen" id="tela-perfil">
+        <div class="ph"><h2>Perfil</h2></div>
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:24px">
+          <div style="width:60px;height:60px;border-radius:16px;background:var(--navy);position:relative;display:flex;align-items:center;justify-content:center">
+            <span style="font-size:30px;font-weight:700;color:#E8F2F8;font-family:Georgia,serif">B</span>
+            <span style="width:12px;height:12px;background:var(--cyan);border-radius:50%;position:absolute;top:4px;right:4px"></span>
+          </div>
+          <div>
+            <div style="font-size:20px;font-weight:400" id="p-nome">—</div>
+            <div style="font-size:13px;color:var(--ink2)">Consultor Ambiental · Baliza Pro</div>
+          </div>
+        </div>
+        <div class="g3" style="margin-bottom:20px">
+          <div class="card" style="text-align:center;padding:16px 12px">
+            <div style="font-size:30px;font-weight:300;font-family:'DM Mono',monospace" id="p-lic">—</div>
+            <div style="font-size:11px;color:var(--ink2);margin-top:4px">Licenças</div>
+          </div>
+          <div class="card" style="text-align:center;padding:16px 12px">
+            <div style="font-size:30px;font-weight:300;font-family:'DM Mono',monospace" id="p-co">—</div>
+            <div style="font-size:11px;color:var(--ink2);margin-top:4px">Condicionantes</div>
+          </div>
+          <div class="card" style="text-align:center;padding:16px 12px">
+            <div style="font-size:30px;font-weight:300;font-family:'DM Mono',monospace;color:var(--red)" id="p-at">—</div>
+            <div style="font-size:11px;color:var(--ink2);margin-top:4px">Atrasadas</div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:500;margin-bottom:12px">Alertas de prazo (Lei 15.190/2025)</div>
+          <div class="det-row"><span class="k">Protocolar renovação</span><span class="v warn">120–180d antes</span></div>
+          <div class="det-row"><span class="k">Condicionante pendente</span><span class="v warn">30d antes</span></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══ MODAL WIZARD ═══ -->
+<div class="modal-bg" id="modal-wiz">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nova licença</h3>
+      <button class="modal-close" onclick="fecharWizard()">✕</button>
+    </div>
+    <div class="steps" id="wiz-steps"></div>
+    <div id="msg-wiz"></div>
+    <div id="wiz-body"></div>
+    <div class="row" style="margin-top:20px;justify-content:flex-end;gap:8px" id="wiz-nav"></div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('modal-wiz').addEventListener('click', e => { if (e.target === document.getElementById('modal-wiz')) fecharWizard() })
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script>
+  const { createClient } = supabase
+  const db = createClient(SUPABASE_URL, SUPABASE_KEY)
+</script>
+<script src="js/app.js"></script>
+</body>
+</html>
